@@ -9,14 +9,19 @@ snake = [
   }
 ];
 
-let direction = "right";
+let direction = "";
+
 let food = {
   x: Math.floor(Math.random() * 15 + 1) * box,
   y: Math.floor(Math.random() * 15 + 1) * box
 },
-
 foodX = food.x,
 foodY = food.y;
+
+let score = 0,
+record = 0,
+pScore = document.getElementById('score'),
+pRecord = document.getElementById('bestScore');
 
 function criarBG() {
   context.fillStyle = "black";
@@ -41,7 +46,6 @@ function drawFood() {
 // 38 = cima
 // 39 = direita
 // 40 = baixo
-
 function update(event){
   if (event.keyCode == 37 && direction != "right") direction = "left";
   if (event.keyCode == 38 && direction != "down") direction = "up";
@@ -51,18 +55,61 @@ function update(event){
 
 document.addEventListener('keydown', function() {update(event);}, false);
 
+function setScore() {
+  let bestScore = localStorage.getItem("score");
+
+  if (bestScore < score) {
+    record = score;
+    localStorage.setItem("score", record);
+  }
+
+  pScore.innerHTML = score;
+  pRecord.innerHTML = bestScore;
+}
+
+function gameOver() {
+  let pOver = document.getElementById('gameOver');
+  clearInterval(jogo);
+  pOver.innerHTML = "<span class='red'>Game Over :c</span>";
+}
+
 function iniciarJogo(){
   let snakeX = snake[0].x,
   snakeY = snake[0].y;
 
-  if(snakeX > 15*box && direction == "right") snakeX = 0;
-  if(snakeX < 0 && direction == "left") snakeX = 16*box;
-  if(snakeY > 15*box && direction == "down") snakeY = 0;
-  if(snakeY < 0 && direction == "up") snakeY = 16*box;
+  // if(snakeX > 15*box && direction == "right") snakeX = 0;
+  // if(snakeX < 0 && direction == "left") snakeX = 16*box;
+  // if(snakeY > 15*box && direction == "down") snakeY = 0;
+  // if(snakeY < 0 && direction == "up") snakeY = 16*box;
+
+  //colisões da cobrinha
+  for (let i = 1; i < snake.length; i++) {
+    if(snakeX == snake[i].x && snakeY == snake[i].y){
+      gameOver();
+    }
+  }
+
+  if(snakeX > 15*box && direction == "right"){
+    snakeX = 15*box;
+    gameOver();
+  }
+  if(snakeX < 0 && direction == "left"){
+    snakeX = 0;
+    gameOver();
+  }
+  if(snakeY > 15*box && direction == "down"){
+    snakeY = 15*box;
+    gameOver();
+  }
+  if(snakeY < 0 && direction == "up"){
+    snakeY = 0;
+    gameOver();
+  }
 
   criarBG();
   criarCobrinha();
   drawFood();
+  setScore();
 
   if (direction == "right") snakeX += box;
   if (direction == "left") snakeX -= box;
@@ -73,8 +120,9 @@ function iniciarJogo(){
     snake.pop();
   }
   else {
-    foodX = Math.floor(Math.random() * 15 + 1) * box,
-    foodY = Math.floor(Math.random() * 15 + 1) * box
+    foodX = Math.floor(Math.random() * 15 + 1) * box;
+    foodY = Math.floor(Math.random() * 15 + 1) * box;
+    score += 1000;
   }
 
 
@@ -84,6 +132,7 @@ function iniciarJogo(){
   }
 
   snake.unshift(newHead);
+
 }
 
 let jogo = setInterval(iniciarJogo, 100);
