@@ -1,2 +1,2 @@
 # snake_game
-Snake Game - Aula Dio
+Jogo feito como estudo prático da aula do bootcamp 'Code like a fullstack girl' da Digital Innovation One
